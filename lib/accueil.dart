@@ -237,7 +237,7 @@ class _AccueilState extends State<Accueil> {
             ),
           ),
           Container(
-            margin: EdgeInsets.only(left: 10, top: 500),
+            margin: EdgeInsets.only(left: 0, top: 500),
             alignment: Alignment.topLeft,
             child: Card(
               child: FutureBuilder(
@@ -255,52 +255,61 @@ class _AccueilState extends State<Accueil> {
                     );
                   } else {
                     return Container(
-                      color: Color(0xFF111518),
+                      color: Color(0xFF1e262c),
                       child: ListView.builder(
                         itemCount: snapshot.data.length,
                         itemBuilder: (context, i) {
                           return Card(
                             color: Color(0xFF1e262c),
                             child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                ListTile(
-                                  leading: Image(
-                                    image: NetworkImage(snapshot.data[i].image),
-                                  ),
-                                  title: Text(
-                                    snapshot.data[i].nom,
-                                    style: TextStyle(
-                                      color: Colors.white, // Couleur du texte
-                                    ),
-                                  ),
-                                  subtitle: Text(
-                                    snapshot.data[i].editeur +
-                                        "\nPrix: " +
-                                        snapshot.data[i].prix,
-                                    style: TextStyle(
-                                      color: Colors.white, // Couleur du texte
-                                    ),
-                                  ),
-                                  isThreeLine: true,
-                                  trailing: ElevatedButton(
-                                    child: const Text('infos'),
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              DataFromAPIDetails(
-                                                  passedId:
-                                                      snapshot.data[i].id),
+                                Row(
+                                  // crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Expanded(
+                                      child: ListTile(
+                                        leading: Image(
+                                          image: NetworkImage(
+                                              snapshot.data[i].image),
                                         ),
-                                      );
-                                      // Fonction appelée lorsqu'on appuie sur le bouton ACHETER
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                        backgroundColor: Color(0xFF616af6),
-                                        fixedSize: const Size(30, 200)),
-                                  ),
+                                        title: Text(
+                                          snapshot.data[i].nom,
+                                          style: TextStyle(
+                                            color: Colors
+                                                .white, // Couleur du texte
+                                          ),
+                                        ),
+                                        subtitle: Text(
+                                          snapshot.data[i].editeur +
+                                              "\nPrix: " +
+                                              snapshot.data[i].prix,
+                                          style: TextStyle(
+                                            color: Colors
+                                                .white, // Couleur du texte
+                                          ),
+                                        ),
+                                        isThreeLine: true,
+                                      ),
+                                    ),
+                                    ElevatedButton(
+                                      child: const Text('En savoir plus'),
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                DataFromAPIDetails(
+                                                    passedId:
+                                                        snapshot.data[i].id),
+                                          ),
+                                        );
+                                        // Fonction appelée lorsqu'on appuie sur le bouton ACHETER
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                          backgroundColor: Color(0xFF616af6),
+                                          fixedSize: const Size(70, 100)),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),

@@ -223,44 +223,53 @@ class _RechercheState extends State<Recherche> {
                           return Card(
                             color: Color(0xFF1e262c),
                             child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                ListTile(
-                                  leading: Image(
-                                    image: NetworkImage(gamesAff[i].image),
-                                  ),
-                                  title: Text(
-                                    gamesAff[i].nom,
-                                    style: TextStyle(
-                                      color: Colors.white, // Couleur du texte
-                                    ),
-                                  ),
-                                  subtitle: Text(
-                                    gamesAff[i].editeur +
-                                        "\nPrix: " +
-                                        gamesAff[i].prix,
-                                    style: TextStyle(
-                                      color: Colors.white, // Couleur du texte
-                                    ),
-                                  ),
-                                  isThreeLine: true,
-                                  trailing: ElevatedButton(
-                                    child: const Text('infos'),
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              DataFromAPIDetails(
-                                                  passedId: gamesAff[i].id),
+                                Row(
+                                  // crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Expanded(
+                                      child: ListTile(
+                                        leading: Image(
+                                          image:
+                                              NetworkImage(gamesAff[i].image),
                                         ),
-                                      );
-                                      // Fonction appelée lorsqu'on appuie sur le bouton ACHETER
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                        backgroundColor: Color(0xFF616af6),
-                                        fixedSize: const Size(30, 200)),
-                                  ),
+                                        title: Text(
+                                          gamesAff[i].nom,
+                                          style: TextStyle(
+                                            color: Colors
+                                                .white, // Couleur du texte
+                                          ),
+                                        ),
+                                        subtitle: Text(
+                                          gamesAff[i].editeur +
+                                              "\nPrix: " +
+                                              gamesAff[i].prix,
+                                          style: TextStyle(
+                                            color: Colors
+                                                .white, // Couleur du texte
+                                          ),
+                                        ),
+                                        isThreeLine: true,
+                                      ),
+                                    ),
+                                    ElevatedButton(
+                                      child: const Text('En savoir plus'),
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                DataFromAPIDetails(
+                                                    passedId: gamesAff[i].id),
+                                          ),
+                                        );
+                                        // Fonction appelée lorsqu'on appuie sur le bouton ACHETER
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                          backgroundColor: Color(0xFF616af6),
+                                          fixedSize: const Size(70, 100)),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
