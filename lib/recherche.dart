@@ -1,65 +1,68 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
-import 'package:projet01/jeuaccueil.dart';
+import 'package:projet01/infoJeu.dart';
+import 'package:projet01/accueil.dart';
 import 'package:projet01/like.dart';
 import 'package:projet01/whishlist.dart';
-import 'package:projet01/infoJeu.dart';
-import 'package:projet01/recherche.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
-/*
-class MyApp extends StatelessWidget {
+class Recherche extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: DataFromAPI(),
-    );
-  }
-}*/
-
-class Accueil extends StatefulWidget {
-  @override
-  _AccueilState createState() => _AccueilState();
+  _RechercheState createState() => _RechercheState();
 }
 
-class _AccueilState extends State<Accueil> {
+class _RechercheState extends State<Recherche> {
   TextEditingController _searchController = TextEditingController();
+  String _searchText = '';
+  List<GameSearched> gamesAff = [];
 
-  Future getGameData() async {
+  @override
+  void initState() {
+    super.initState();
+    _searchController.addListener(() {
+      setState(() {
+        _searchText = _searchController.text;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  Future getGameData(String jeuAChercher, int i) async {
     String name = "";
     String prix = "";
     String editeur = "";
     String image = "";
 
+    gamesAff = [];
+
     var response = await http.get(Uri.parse(
-        'https://api.steampowered.com/ISteamChartsService/GetMostPlayedGames/v1/?'));
+        'https://steamcommunity.com/actions/SearchApps/' + jeuAChercher));
     //.get(Uri.parse('https://steamcommunity.com/actions/SearchApps/pine'));
-    //var jsonData = jsonDecode(response.body);
-    Map<String, dynamic> jsonData =
-        new Map<String, dynamic>.from(json.decode(response.body));
+    var jsonData = jsonDecode(response.body);
+
+    print(jsonData);
     //print(jsonData["response"]["ranks"]);
-    List<GameMostPlayed> games = [];
+    List<GameSearched> games = [];
+    print(gamesAff);
 
-    int compteur = 0;
+    for (var u in jsonData) {
+      String id = u["appid"];
+      name = u["name"];
+      image = u["logo"];
 
-    for (var u in jsonData["response"]["ranks"]) {
-      if (compteur > 4) {
-        break;
-      }
-
-      int id = u["appid"];
+      print(name);
 
       String url = 'https://store.steampowered.com/api/appdetails?appids=$id';
       var responseID = await http.get(Uri.parse(url));
       Map<String, dynamic> jsonDataID =
           new Map<String, dynamic>.from(json.decode(responseID.body));
-
-      print(id);
-
-      name = jsonDataID[id.toString()]["data"]["name"];
 
       editeur = jsonDataID[id.toString()]["data"]["developers"][0];
 
@@ -75,15 +78,19 @@ class _AccueilState extends State<Accueil> {
           prix = "N/A";
         }
       }
-      image = jsonDataID[id.toString()]["data"]["header_image"];
 
-      GameMostPlayed game =
-          GameMostPlayed(name, editeur, prix, image, id.toString());
+      GameSearched game = GameSearched(name, editeur, prix, image, id);
 
       games.add(game);
-      compteur = compteur + 1;
     }
-    print(games.length);
+    for (int i = 0; i < gamesAff.length; i++) {
+      print(gamesAff[i].id);
+      print(gamesAff[i].nom);
+    }
+    //print(games.length);
+
+    gamesAff = games;
+
     return games;
   }
 
@@ -92,13 +99,24 @@ class _AccueilState extends State<Accueil> {
     return Scaffold(
       backgroundColor: Color(0xFF1c2325),
       appBar: AppBar(
+        leading: IconButton(
+          icon: new SvgPicture.asset('assets/close.svg'),
+          color: Colors.white,
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => Accueil(),
+              ),
+            );
+          },
+        ),
         backgroundColor: Color(0xFF1c2325),
         title: Text(
-          "Accueil",
+          "Recherche",
           style:
               TextStyle(fontWeight: FontWeight.bold, fontFamily: 'GoogleSans'),
         ),
-        automaticallyImplyLeading: false,
         actions: [
           new IconButton(
               icon: new SvgPicture.asset(
@@ -145,12 +163,6 @@ class _AccueilState extends State<Accueil> {
             child: Column(
               children: [
                 TextField(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => Recherche()),
-                    );
-                  },
                   controller: _searchController,
                   decoration: InputDecoration(
                     fillColor: Color(0xFF1e262c),
@@ -165,99 +177,48 @@ class _AccueilState extends State<Accueil> {
                       color: Color(0xFF5960d7),
                     ),
                   ),
+                  style: TextStyle(color: Colors.white),
                 ),
               ],
             ),
           ),
           Container(
-            height: 350,
-            margin: EdgeInsets.only(top: 80),
-            alignment: Alignment(-0.95, 0.95),
-            decoration: BoxDecoration(
-              color: const Color(0xff7c94b6),
-              image: const DecorationImage(
-                image: AssetImage('assets/hogwart.png'),
-                fit: BoxFit.cover,
-              ),
-            ),
-            child: ElevatedButton(
-              child: Text("En savoir plus"),
-              onPressed: () {
-                //ajouter la page du jeu coder en dur ************
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => Jeuaccueil(),
-                  ),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF616af6),
-                  fixedSize: const Size(150, 30)),
-            ),
-          ),
-          Container(
-            margin: EdgeInsets.only(left: 10, top: 460),
-            alignment: Alignment.topLeft,
-            child: const Text(
-              "Les meilleures ventes",
-              style: TextStyle(
-                color: Colors.white,
-                fontFamily: 'GoogleSans',
-                fontSize: 20,
-                decoration: TextDecoration.underline,
-              ),
-            ),
-          ),
-          Container(
-            margin: EdgeInsets.only(left: 10, top: 250),
-            alignment: Alignment.topLeft,
-            child: const Text(
-              "Hogwarts Legacy: L'Héritage de Poudlard",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 15,
-                fontFamily: 'GoogleSans',
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          Container(
-            margin: EdgeInsets.only(left: 10, top: 300),
-            alignment: Alignment.topLeft,
-            child: const Text(
-              "Hogwarts Legacy : L'Héritage de Poudlard est\n "
-              "un RPG d'action-aventure immersif en monde ouvert\n"
-              " qui se déroule dans l'univers des livres Harry Potter.",
-              style: TextStyle(
-                color: Colors.white,
-                fontFamily: 'GoogleSans',
-                fontSize: 12,
-              ),
-            ),
-          ),
-          Container(
-            margin: EdgeInsets.only(left: 10, top: 500),
+            margin: EdgeInsets.only(left: 0, top: 90),
             alignment: Alignment.topLeft,
             child: Card(
               child: FutureBuilder(
-                future: getGameData(),
+                future: getGameData(_searchText, 1),
                 builder: (context, snapshot) {
-                  if (snapshot.data == null) {
+                  if ((gamesAff.length == 0 || gamesAff == null) &&
+                      _searchText == "") {
                     return Container(
                       color: Color(0xFF1e262c),
                       child: Center(
                         child: Text(
-                          "chargement...",
-                          style: TextStyle(color: Colors.white),
+                          "Aucune recherche",
+                          style: TextStyle(
+                            color: Colors.white, // Couleur du texte
+                          ),
+                        ),
+                      ),
+                    );
+                  } else if (gamesAff.length == 0 || gamesAff == null) {
+                    return Container(
+                      color: Color(0xFF1e262c),
+                      child: Center(
+                        child: Text(
+                          "Recherche...",
+                          style: TextStyle(
+                            color: Colors.white, // Couleur du texte
+                          ),
                         ),
                       ),
                     );
                   } else {
                     return Container(
-                      color: Color(0xFF111518),
+                      color: Color(0xFF1e262c),
                       child: ListView.builder(
-                        itemCount: snapshot.data.length,
+                        itemCount: gamesAff.length,
                         itemBuilder: (context, i) {
                           return Card(
                             color: Color(0xFF1e262c),
@@ -266,18 +227,18 @@ class _AccueilState extends State<Accueil> {
                               children: [
                                 ListTile(
                                   leading: Image(
-                                    image: NetworkImage(snapshot.data[i].image),
+                                    image: NetworkImage(gamesAff[i].image),
                                   ),
                                   title: Text(
-                                    snapshot.data[i].nom,
+                                    gamesAff[i].nom,
                                     style: TextStyle(
                                       color: Colors.white, // Couleur du texte
                                     ),
                                   ),
                                   subtitle: Text(
-                                    snapshot.data[i].editeur +
+                                    gamesAff[i].editeur +
                                         "\nPrix: " +
-                                        snapshot.data[i].prix,
+                                        gamesAff[i].prix,
                                     style: TextStyle(
                                       color: Colors.white, // Couleur du texte
                                     ),
@@ -291,8 +252,7 @@ class _AccueilState extends State<Accueil> {
                                         MaterialPageRoute(
                                           builder: (context) =>
                                               DataFromAPIDetails(
-                                                  passedId:
-                                                      snapshot.data[i].id),
+                                                  passedId: gamesAff[i].id),
                                         ),
                                       );
                                       // Fonction appelée lorsqu'on appuie sur le bouton ACHETER
@@ -319,7 +279,7 @@ class _AccueilState extends State<Accueil> {
   }
 }
 
-class GameMostPlayed {
+class GameSearched {
   final String nom, editeur, prix, image, id;
-  GameMostPlayed(this.nom, this.editeur, this.prix, this.image, this.id);
+  GameSearched(this.nom, this.editeur, this.prix, this.image, this.id);
 }
