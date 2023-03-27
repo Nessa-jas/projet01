@@ -199,6 +199,7 @@ class _DataFromAPIDetailsState extends State<DataFromAPIDetails> {
     String editeur = "";
     String image = "";
     String description = "";
+    String bckgrnd = "";
 
     List<GameDetails> games = [];
 
@@ -228,9 +229,13 @@ class _DataFromAPIDetailsState extends State<DataFromAPIDetails> {
 
     description = jsonDataID[widget.passedId]["data"]["detailed_description"];
 
-    print(description);
+    bckgrnd = jsonDataID[widget.passedId]["data"]["background"];
 
-    GameDetails game = GameDetails(name, editeur, prix, image, description);
+    print("background : ");
+    print(bckgrnd);
+    print("fin");
+    GameDetails game =
+        GameDetails(name, editeur, prix, image, description, bckgrnd);
 
     games.add(game);
 
@@ -311,8 +316,8 @@ class _DataFromAPIDetailsState extends State<DataFromAPIDetails> {
                             alignment: Alignment(-0.95, 0.95),
                             decoration: BoxDecoration(
                               color: const Color(0xff7c94b6),
-                              image: const DecorationImage(
-                                image: AssetImage('assets/backgnd.png'),
+                              image: DecorationImage(
+                                image: NetworkImage(snapshot.data[i].backgrnd),
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -405,6 +410,7 @@ class _DataFromAPIDetailsState extends State<DataFromAPIDetails> {
 }
 
 class GameDetails {
-  final String nom, editeur, prix, image, description;
-  GameDetails(this.nom, this.editeur, this.prix, this.image, this.description);
+  final String nom, editeur, prix, image, description, backgrnd;
+  GameDetails(this.nom, this.editeur, this.prix, this.image, this.description,
+      this.backgrnd);
 }
