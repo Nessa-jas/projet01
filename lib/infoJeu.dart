@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DataFromAPIDetails extends StatefulWidget {
   final String passedId;
@@ -13,6 +15,124 @@ class DataFromAPIDetails extends StatefulWidget {
 }
 
 class _DataFromAPIDetailsState extends State<DataFromAPIDetails> {
+  //Recupération du username
+  String? _userId;
+  bool isLiked = false;
+  bool isWishlist = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _getCurrentUser();
+    checkLike();
+    checkWishlist();
+  }
+
+  Future<void> _getCurrentUser() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      setState(() {
+        _userId = user.uid;
+      });
+    }
+  }
+
+  //Methode permettant d'ajouter le jeu a la BDD wishlist
+  Future<void> addWishlist() async {
+    _getCurrentUser();
+    String? user = _userId;
+    print(user);
+    try {
+      if (isWishlist != true) {
+        // Récupération de la référence de la collection 'users'
+        final CollectionReference usersCollection =
+            FirebaseFirestore.instance.collection('wishlist');
+
+        // Ecriture des données dans la collection 'users'
+        await usersCollection.add({
+          'username': user,
+          'appid': widget.passedId,
+        });
+        setState(() {
+          isWishlist = true;
+        });
+      }
+    } catch (error) {
+      print(
+          'Erreur lors de l\'écriture des données dans la table wishlist : $error');
+    }
+  }
+
+  //Methode permettant d'ajouter le jeu a la BDD likes
+  Future<void> addLikes() async {
+    _getCurrentUser();
+    String? user = _userId;
+    print(user);
+    try {
+      if (isLiked != true) {
+        // Récupération de la référence de la collection 'users'
+        final CollectionReference usersCollection =
+            FirebaseFirestore.instance.collection('like');
+
+        // Ecriture des données dans la collection 'users'
+        await usersCollection.add({
+          'username': user,
+          'appid': widget.passedId,
+        });
+
+        setState(() {
+          isLiked = true;
+        });
+      }
+    } catch (error) {
+      print(
+          'Erreur lors de l\'écriture des données dans la table like : $error');
+    }
+  }
+
+  //Methode permettant de savoir si le jeu a deja ete liké
+  Future<void> checkLike() async {
+    _getCurrentUser();
+    String? user = _userId;
+    final QuerySnapshot result = await FirebaseFirestore.instance
+        .collection('like')
+        .where("username", isEqualTo: user)
+        .where("appid", isEqualTo: widget.passedId)
+        .get();
+    final List<DocumentSnapshot> documents = result.docs;
+    if (documents.length != 0) {
+      setState(() {
+        isLiked = true;
+      });
+    } else {
+      setState(() {
+        isLiked = false;
+      });
+    }
+  }
+
+  //Methode permettant de savoir si le jeu a deja ete wishlisté
+  Future<void> checkWishlist() async {
+    _getCurrentUser();
+    String? user = _userId;
+    final QuerySnapshot result = await FirebaseFirestore.instance
+        .collection('wishlist')
+        .where("username", isEqualTo: user)
+        .where("appid", isEqualTo: widget.passedId)
+        .get();
+    final List<DocumentSnapshot> documents = result.docs;
+    if (documents.length != 0) {
+      setState(() {
+        isWishlist = true;
+      });
+    } else {
+      setState(() {
+        isWishlist = false;
+      });
+    }
+  }
+
+  //Methode de recupération des informations du jeu via l'API Steam
   Future getGameData() async {
     String name = "";
     String prix = "";
@@ -70,36 +190,22 @@ class _DataFromAPIDetailsState extends State<DataFromAPIDetails> {
         ),
         actions: [
           new IconButton(
-              icon: new SvgPicture.asset(
-                'assets/like.svg',
+              icon: SvgPicture.asset(
+                isLiked ? 'assets/like_full.svg' : 'assets/like.svg',
                 height: 20.0,
                 width: 20.0,
               ),
               onPressed: () {
-                /*
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => Like(),
-                  ),
-                );
-              */
+                addLikes();
               }),
           new IconButton(
-            icon: new SvgPicture.asset(
-              'assets/whishlist.svg',
+            icon: SvgPicture.asset(
+              isWishlist ? 'assets/whishlist_full.svg' : 'assets/whishlist.svg',
               height: 20.0,
               width: 20.0,
             ),
             onPressed: () {
-              /*
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => Whishlist(),
-                ),
-              );
-            */
+              addWishlist();
             },
           ),
         ],

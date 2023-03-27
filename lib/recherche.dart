@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:projet01/infoJeu.dart';
-import 'package:projet01/accueil.dart';
-import 'package:projet01/like.dart';
-import 'package:projet01/whishlist.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+
+import 'package:projet01/infoJeu.dart';
+import 'package:projet01/accueil.dart';
+import 'package:projet01/game.dart';
 
 class Recherche extends StatefulWidget {
   @override
@@ -16,7 +16,7 @@ class Recherche extends StatefulWidget {
 class _RechercheState extends State<Recherche> {
   TextEditingController _searchController = TextEditingController();
   String _searchText = '';
-  List<GameSearched> gamesAff = [];
+  List<Game> gamesAff = [];
 
   @override
   void initState() {
@@ -49,7 +49,7 @@ class _RechercheState extends State<Recherche> {
 
     print(jsonData);
     //print(jsonData["response"]["ranks"]);
-    List<GameSearched> games = [];
+    List<Game> games = [];
     print(gamesAff);
 
     for (var u in jsonData) {
@@ -79,7 +79,7 @@ class _RechercheState extends State<Recherche> {
         }
       }
 
-      GameSearched game = GameSearched(name, editeur, prix, image, id);
+      Game game = Game(name, editeur, prix, image, id);
 
       games.add(game);
     }
@@ -117,37 +117,6 @@ class _RechercheState extends State<Recherche> {
           style:
               TextStyle(fontWeight: FontWeight.bold, fontFamily: 'GoogleSans'),
         ),
-        actions: [
-          new IconButton(
-              icon: new SvgPicture.asset(
-                'assets/like.svg',
-                height: 20.0,
-                width: 20.0,
-              ),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => Like(),
-                  ),
-                );
-              }),
-          new IconButton(
-            icon: new SvgPicture.asset(
-              'assets/whishlist.svg',
-              height: 20.0,
-              width: 20.0,
-            ),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => Whishlist(),
-                ),
-              );
-            },
-          ),
-        ],
       ),
       body: Stack(
         alignment: Alignment.topCenter,
@@ -286,9 +255,4 @@ class _RechercheState extends State<Recherche> {
       ),
     );
   }
-}
-
-class GameSearched {
-  final String nom, editeur, prix, image, id;
-  GameSearched(this.nom, this.editeur, this.prix, this.image, this.id);
 }

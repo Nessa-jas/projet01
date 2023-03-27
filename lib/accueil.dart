@@ -183,11 +183,12 @@ class _AccueilState extends State<Accueil> {
             child: ElevatedButton(
               child: Text("En savoir plus"),
               onPressed: () {
-                //ajouter la page du jeu coder en dur ************
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => Jeuaccueil(),
+                    builder: (context) => DataFromAPIDetails(
+                      passedId: "990080",
+                    ),
                   ),
                 );
               },
