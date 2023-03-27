@@ -4,21 +4,10 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-import 'package:projet01/jeuaccueil.dart';
 import 'package:projet01/like.dart';
 import 'package:projet01/whishlist.dart';
 import 'package:projet01/infoJeu.dart';
 import 'package:projet01/recherche.dart';
-
-/*
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: DataFromAPI(),
-    );
-  }
-}*/
 
 class Accueil extends StatefulWidget {
   @override

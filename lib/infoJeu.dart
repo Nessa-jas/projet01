@@ -37,31 +37,9 @@ class _DataFromAPIDetailsState extends State<DataFromAPIDetails> {
     }
   }
 
-  //Methode permettant d'ajouter le jeu a la BDD wishlist
-  Future<void> addWishlist() async {
-    _getCurrentUser();
-    String? user = _userId;
-    print(user);
-    try {
-      if (isWishlist != true) {
-        // Récupération de la référence de la collection 'users'
-        final CollectionReference usersCollection =
-            FirebaseFirestore.instance.collection('wishlist');
-
-        // Ecriture des données dans la collection 'users'
-        await usersCollection.add({
-          'username': user,
-          'appid': widget.passedId,
-        });
-        setState(() {
-          isWishlist = true;
-        });
-      }
-    } catch (error) {
-      print(
-          'Erreur lors de l\'écriture des données dans la table wishlist : $error');
-    }
-  }
+  /**
+  **************************************Methodes like
+   */
 
   //Methode permettant d'ajouter le jeu a la BDD likes
   Future<void> addLikes() async {
@@ -90,6 +68,30 @@ class _DataFromAPIDetailsState extends State<DataFromAPIDetails> {
     }
   }
 
+  //Methode permettant de supprimer un jeu des like
+  Future<void> deleteLike() async {
+    _getCurrentUser();
+    String? user = _userId;
+    try {
+      await FirebaseFirestore.instance
+          .collection('like')
+          .where('appid', isEqualTo: widget.passedId)
+          .where('username', isEqualTo: user)
+          .get()
+          .then((querySnapshot) {
+        querySnapshot.docs.forEach((doc) {
+          doc.reference.delete();
+        });
+      });
+      setState(() {
+        isLiked = false;
+      });
+    } catch (error) {
+      print(
+          'Erreur lors de la suppression des données dans la table like : $error');
+    }
+  }
+
   //Methode permettant de savoir si le jeu a deja ete liké
   Future<void> checkLike() async {
     _getCurrentUser();
@@ -111,6 +113,10 @@ class _DataFromAPIDetailsState extends State<DataFromAPIDetails> {
     }
   }
 
+  /*******
+   * ***************************************************Whishlist
+   */
+
   //Methode permettant de savoir si le jeu a deja ete wishlisté
   Future<void> checkWishlist() async {
     _getCurrentUser();
@@ -129,6 +135,60 @@ class _DataFromAPIDetailsState extends State<DataFromAPIDetails> {
       setState(() {
         isWishlist = false;
       });
+    }
+  }
+
+  //Methode permettant de supprimer un jeu des like
+  Future<void> deleteWhishlist() async {
+    _getCurrentUser();
+    String? user = _userId;
+    try {
+      await FirebaseFirestore.instance
+          .collection('wishlist')
+          .where('appid', isEqualTo: widget.passedId)
+          .where('username', isEqualTo: user)
+          .get()
+          .then((querySnapshot) {
+        querySnapshot.docs.forEach((doc) {
+          doc.reference.delete();
+        });
+      });
+      setState(() {
+        isWishlist = false;
+      });
+    } catch (error) {
+      print(
+          'Erreur lors de la suppression des données dans la table like : $error');
+    }
+  }
+
+  /**
+   **************************************************General
+   */
+
+  //Methode permettant d'ajouter le jeu a la BDD wishlist
+  Future<void> addWishlist() async {
+    _getCurrentUser();
+    String? user = _userId;
+    print(user);
+    try {
+      if (isWishlist != true) {
+        // Récupération de la référence de la collection 'users'
+        final CollectionReference usersCollection =
+            FirebaseFirestore.instance.collection('wishlist');
+
+        // Ecriture des données dans la collection 'users'
+        await usersCollection.add({
+          'username': user,
+          'appid': widget.passedId,
+        });
+        setState(() {
+          isWishlist = true;
+        });
+      }
+    } catch (error) {
+      print(
+          'Erreur lors de l\'écriture des données dans la table wishlist : $error');
     }
   }
 
@@ -196,7 +256,11 @@ class _DataFromAPIDetailsState extends State<DataFromAPIDetails> {
                 width: 20.0,
               ),
               onPressed: () {
-                addLikes();
+                if (isLiked == false) {
+                  addLikes();
+                } else {
+                  deleteLike();
+                }
               }),
           new IconButton(
             icon: SvgPicture.asset(
@@ -205,7 +269,11 @@ class _DataFromAPIDetailsState extends State<DataFromAPIDetails> {
               width: 20.0,
             ),
             onPressed: () {
-              addWishlist();
+              if (isWishlist == false) {
+                addWishlist();
+              } else {
+                deleteWhishlist();
+              }
             },
           ),
         ],
