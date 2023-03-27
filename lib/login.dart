@@ -84,10 +84,11 @@ class _MyLoginState extends State<MyLogin> {
                 'Bienvenue !',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 33,
-                    fontFamily: 'GoogleSans',
-                    fontWeight: FontWeight.bold),
+                  color: Colors.white,
+                  fontSize: 33,
+                  fontFamily: 'GoogleSans',
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
             Container(

@@ -286,7 +286,10 @@ class _DataFromAPIDetailsState extends State<DataFromAPIDetails> {
               if (snapshot.data == null) {
                 return Container(
                   child: Center(
-                    child: Text("chargement..."),
+                    child: Text(
+                      "chargement...",
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                 );
               } else {
